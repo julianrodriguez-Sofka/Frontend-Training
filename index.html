@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANKO - Banca Digital Segura</title>
+    <link rel="stylesheet" href="styles.css">
+    <style> 
+        .icon-security::before { content: '🛡️'; }
+        .icon-speed::before { content: '⚡'; }
+        .icon-mobile::before { content: '📱'; }
+    </style>
+</head>
+<body>
+    
+    <div class="loading-overlay" id="loadingPage">
+        <div class="loader"></div>
+        <p class="loading-text">Cargando, ten paciencia...</p>
+    </div>
+
+    <div id="mainContent" style="display: none;">
+        <nav class="navbar">
+            <div class="logo">BANKO</div>
+            <div>
+                <a href="login.html">Iniciar Sesión</a>
+                <a href="register.html" class="btn btn-primary" style="margin-left: 10px;">Abrir Cuenta</a>
+            </div>
+        </nav>
+
+        <header class="hero-section">
+            <div class="hero-content">
+                <h1>Tu Banca Digital de Confianza, Sin Comisiones Ocultas.</h1>
+                <p>Gestiona tus finanzas, realiza transacciones instantáneas y alcanza tus metas económicas con la plataforma más segura y eficiente.</p>
+                <div class="hero-buttons">
+                    <a href="register.html" class="btn btn-primary">Crear Cuenta Gratis</a>
+                    <a href="login.html" class="btn btn-secondary">Acceso Cliente</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <h2 style="text-align: center; color: var(--color-primary); margin-bottom: 3rem;">Por qué elegir Management Bank</h2>
+            
+            <div class="features-grid">
+                
+                <div class="feature-item">
+                    <div class="icon icon-security"></div>
+                    <h3>Seguridad de Nivel Superior</h3>
+                    <p>Protección de datos y transacciones con cifrado avanzado. Tu tranquilidad es nuestra prioridad.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="icon icon-speed"></div>
+                    <h3>Transacciones Instantáneas</h3>
+                    <p>Realiza pagos y transferencias a cualquier cuenta de forma rápida, eficiente y sin demoras.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="icon icon-mobile"></div>
+                    <h3>Control Total Móvil</h3>
+                    <p>Accede a todas las funcionalidades, desde el Dashboard hasta el Cajero, donde sea que estés.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingPage = document.getElementById('loadingPage');
+            const mainContent = document.getElementById('mainContent');
+            
+            setTimeout(() => {
+                loadingPage.style.display = 'none';
+                mainContent.style.display = 'block';
+            }, 1500); 
+        });
+    </script>
+</body>
+</html>

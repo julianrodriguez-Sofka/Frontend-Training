@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Static HTML",
+            // Usa 'file:///' para abrir un archivo local.
+            // Esto le dice a Chrome que abra directamente tu index.html.
+            "url": "file:///${workspaceFolder}/index.html" 
+            // Opcional: si quieres que inicie una instancia nueva de Chrome
+            // "webRoot": "${workspaceFolder}"
+        }
+    ]
+}

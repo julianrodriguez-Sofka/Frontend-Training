@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Transacciones</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="dashboard.html">Management Bank</a></div>
+        <div>
+            <a href="dashboard.html">Volver al Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="color: var(--color-primary); margin-bottom: 2rem;">Historial de Movimientos</h1>
+        
+        <div class="card" style="padding: 1rem;">
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Tipo</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-05-10</td>
+                        <td>Transferencia recibida (Salario)</td>
+                        <td>Crédito</td>
+                        <td class="credit">+ $ 3,500.00</td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-11</td>
+                        <td>Pago de servicios públicos</td>
+                        <td>Débito</td>
+                        <td class="debit">- $ 150.75</td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-12</td>
+                        <td>Transferencia enviada a 001-999-000-1</td>
+                        <td>Débito</td>
+                        <td class="debit">- $ 500.00</td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-12</td>
+                        <td>Depósito en cajero automático</td>
+                        <td>Crédito</td>
+                        <td class="credit">+ $ 200.00</td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-13</td>
+                        <td>Compra en supermercado (Tarjeta)</td>
+                        <td>Débito</td>
+                        <td class="debit">- $ 85.20</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
