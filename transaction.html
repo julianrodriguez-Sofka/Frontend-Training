@@ -8,7 +8,7 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo"><a href="dashboard.html">Management Bank</a></div>
+        <div class="logo"><a href="dashboard.html">BANKO</a></div>
         <div>
             <a href="dashboard.html">Volver al Dashboard</a>
         </div>
@@ -17,7 +17,8 @@
     <div class="container" style="max-width: 600px;">
         <div class="card">
             <h2 style="color: var(--color-primary); margin-bottom: 1.5rem;">Transferencia a Terceros</h2>
-            <form>
+            
+            <form id="transferForm">
                 <div class="form-group">
                     <label for="recipientDni">DNI del Destinatario</label>
                     <input type="text" id="recipientDni" required placeholder="Identificación del beneficiario">
@@ -34,11 +35,43 @@
                     <label for="description">Concepto/Descripción</label>
                     <input type="text" id="description" placeholder="Ej: Pago de renta">
                 </div>
-                <button type="submit" class="btn btn-success" style="width: 100%;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
                     Confirmar Transacción
                 </button>
             </form>
         </div>
     </div>
+    
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('transferForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const amount = parseFloat(document.getElementById('amount').value);
+                const recipientDni = document.getElementById('recipientDni').value;
+
+                if (amount > 0 && recipientDni.length > 0) {
+                    
+                    const result = handleTransfer(amount, recipientDni);
+                    
+                    if (result.success) {
+                        showAlert(`Transferencia de $${amount.toFixed(2)} enviada con éxito a DNI ${recipientDni}.`, true);
+                        
+                        document.getElementById('recipientDni').value = '';
+                        document.getElementById('accountNumber').value = '';
+                        document.getElementById('amount').value = '';
+                        document.getElementById('description').value = '';
+                        
+                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+                        
+                    } else {
+                        showAlert(result.message, false);
+                    }
+                } else {
+                    showAlert('Verifica el monto y el DNI del destinatario.', false);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

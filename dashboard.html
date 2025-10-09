@@ -9,12 +9,12 @@
         .icon-bank::before { content: '🏦'; }
         .icon-send::before { content: '💸'; }
         .icon-history::before { content: '📜'; }
-        .icon-atm::before { content: '🏧'; } /* Nuevo icono */
+        .icon-atm::before { content: '🏧'; } 
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo"><a href="dashboard.html">Management Bank</a></div>
+        <div class="logo"><a href="dashboard.html">BANKO</a></div>
         <div>
             <a href="#">Perfil (Usuario Test)</a>
             <a href="index.html">Cerrar Sesión</a>
@@ -28,7 +28,7 @@
 
         <div class="balance-card">
             <h2>Saldo Disponible</h2>
-            <p>$ 12,345.50</p>
+            <p id="displayBalance">$ 12,345.50</p>
             <span style="opacity: 0.7;">Cuenta Nº: 001-456-789-0</span>
         </div>
 
@@ -61,5 +61,13 @@
             
         </div>
     </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const balance = getBalance();
+            document.getElementById('displayBalance').innerText = `$ ${balance.toFixed(2)}`;
+        });
+    </script>
 </body>
 </html>
