@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Bancario</title>
+    <link rel="stylesheet" href="styles.css">
+    <style> 
+        .icon-bank::before { content: '🏦'; }
+        .icon-send::before { content: '💸'; }
+        .icon-history::before { content: '📜'; }
+        .icon-atm::before { content: '🏧'; } 
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="/dashboard">BANKO</a></div>
+        <div>
+            <a href="#">Perfil (Usuario Test)</a>
+            <a href="/login">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1 style="color: var(--color-primary); margin-bottom: 1rem;">Panel de Control</h1>
+        </header>
+        
+        <div id="message-container" style="margin-bottom: 20px;"></div>
+
+        <div class="balance-card">
+            <h2>Saldo Disponible</h2>
+            <p id="displayBalance">$ 12,345.50</p>
+            <span style="opacity: 0.7;">Cuenta Nº: 001-456-789-0</span>
+        </div>
+
+        <h2 style="margin-top: 2rem; color: var(--color-text);">Operaciones Rápidas</h2>
+        <div class="actions-grid">
+            
+            <a href="/transaction" class="action-item">
+                <div class="icon icon-send"></div>
+                <h3>Realizar Transacción</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8;">Enviar dinero a otra cuenta.</p>
+            </a>
+            
+            <a href="/atm_simulator" class="action-item">
+                <div class="icon icon-atm"></div>
+                <h3>Cajero Automático</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8;">Depósitos y retiros rápidos.</p>
+            </a>
+
+            <a href="/history" class="action-item">
+                <div class="icon icon-history"></div>
+                <h3>Ver Historial</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8;">Revisar movimientos pasados.</p>
+            </a>
+            
+            <a href="/profile_settings" class="action-item">
+                <div class="icon icon-bank"></div>
+                <h3>Modificar Perfil</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8;">Cambiar DNI, email o contraseña.</p>
+            </a>
+            
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const msgContainer = document.getElementById('message-container');
+            
+            // Lógica para capturar mensajes de la API (ej: después de una transacción)
+            if (params.has('success') || params.has('error')) {
+                const isError = params.has('error');
+                const message = params.get(isError ? 'error' : 'success').replace(/_/g, ' ');
+                const alertClass = isError ? 'alert-error' : 'alert-success';
+
+                msgContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Perfil</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="/dashboard">BANKO</a></div>
+        <div>
+            <a href="/dashboard">Volver al Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 600px;">
+        <h1 style="color: var(--color-primary); margin-bottom: 2rem; text-align: center;">Configuración de Perfil</h1>
+        
+        <div id="message-container" style="margin-bottom: 20px;"></div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem; border-bottom: 2px solid #ccc; padding-bottom: 0.5rem;">Información Personal</h2>
+            
+            <form action="/profile/update" method="POST"> 
+                
+                <input type="hidden" name="accountId" value="123456789">
+
+                <div class="form-group">
+                    <label for="userId">ID de Usuario (Solo Lectura)</label>
+                    <input type="text" id="userId" value="TEST_ID_1" disabled style="background-color: #f0f0f0; cursor: not-allowed;">
+                </div>
+
+                <div class="form-group">
+                    <label for="dni">DNI / Identificación</label>
+                    <input type="text" id="dni" name="dni" value="98765432Y" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Nombre de Usuario</label>
+                    <input type="text" id="username" name="username" value="NewName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" value="test@bank.com" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Guardar Cambios en Perfil
+                </button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 30px;">
+            <h2 style="margin-bottom: 1.5rem; color: var(--color-danger); border-bottom: 2px solid var(--color-danger); padding-bottom: 0.5rem;">Cambiar Contraseña</h2>
+            
+            <form action="/profile/password" method="POST">
+                
+                <input type="hidden" name="accountId" value="123456789">
+                
+                <div class="form-group">
+                    <label for="currentPassword">Contraseña Actual</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Nueva Contraseña</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmNewPassword">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="confirmNewPassword" required>
+                </div>
+
+                <button type="submit" class="btn btn-danger" style="width: 100%;">
+                    Actualizar Contraseña
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const msgContainer = document.getElementById('message-container');
+            
+            // Lógica para capturar mensajes de la API después de una actualización
+            if (params.has('success') || params.has('error')) {
+                const isError = params.has('error');
+                const message = params.get(isError ? 'error' : 'success').replace(/_/g, ' ');
+                const alertClass = isError ? 'alert-error' : 'alert-success';
+
+                msgContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            }
+
+            // NOTA: En un proyecto real, se usaría fetch() para cargar los valores iniciales del usuario (DNI, username, email)
+            // al cargar la página. Aquí se usan valores estáticos ("98765432Y", "NewName", etc.).
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realizar Transacción</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><a href="/dashboard">BANKO</a></div>
+        <div>
+            <a href="/dashboard">Volver al Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 600px;">
+        <div class="card">
+            <h2 style="color: var(--color-primary); margin-bottom: 1.5rem;">Transferencia a Terceros</h2>
+            
+            <div id="message-container" style="margin-bottom: 15px;"></div>
+
+            <form action="/transaction" method="POST">
+                
+                <input type="hidden" name="accountId" value="123456789"> 
+                <input type="hidden" name="type" value="transfer"> 
+                
+                <div class="form-group">
+                    <label for="recipientDni">DNI del Destinatario</label>
+                    <input type="text" id="recipientDni" placeholder="Identificación del beneficiario">
+                </div>
+                <div class="form-group">
+                    <label for="targetAccount">Número de Cuenta Destino</label>
+                    <input type="text" id="targetAccount" name="targetAccount" required placeholder="Ej: 001-987-654-3">
+                </div>
+                <div class="form-group">
+                    <label for="amount">Monto a Transferir ($)</label>
+                    <input type="number" id="amount" name="amount" required min="1.00" step="0.01" placeholder="Ej: 500.00">
+                </div>
+                <div class="form-group">
+                    <label for="description">Concepto/Descripción</label>
+                    <input type="text" id="description" placeholder="Ej: Pago de renta">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Confirmar Transacción
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const msgContainer = document.getElementById('message-container');
+            
+            if (params.has('success') || params.has('error')) {
+                const isError = params.has('error');
+                const message = params.get(isError ? 'error' : 'success').replace(/_/g, ' ');
+                const alertClass = isError ? 'alert-error' : 'alert-success';
+
+                msgContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
