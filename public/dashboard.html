@@ -1,83 +1,165 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Bancario</title>
-    <link rel="stylesheet" href="styles.css">
-    <style> 
-        .icon-bank::before { content: '🏦'; }
-        .icon-send::before { content: '💸'; }
-        .icon-history::before { content: '📜'; }
-        .icon-atm::before { content: '🏧'; } 
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Bancario</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .icon-bank::before { content: '🏦'; }
+    .icon-send::before { content: '💸'; }
+    .icon-history::before { content: '📜'; }
+    .icon-atm::before { content: '🏧'; }
+  </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo"><a href="/dashboard">BANKO</a></div>
-        <div>
-            <a href="#">Perfil (Usuario Test)</a>
-            <a href="/login">Cerrar Sesión</a>
-        </div>
-    </nav>
+  <nav class="navbar">
+    <div class="logo"><a href="dashboard.html">BANKO</a></div>
+    <div>
+      <a href="profile_settings.html" id="userNameLink">Perfil</a>
+      <a href="login.html" onclick="logout()">Cerrar Sesión</a>
+    </div>
+  </nav>
 
-    <div class="container">
-        <header>
-            <h1 style="color: var(--color-primary); margin-bottom: 1rem;">Panel de Control</h1>
-        </header>
-        
-        <div id="message-container" style="margin-bottom: 20px;"></div>
+  <div class="container">
+    <header>
+      <h1 style="color: var(--color-primary); margin-bottom: 2rem;">Panel de Control</h1>
+    </header>
 
-        <div class="balance-card">
-            <h2>Saldo Disponible</h2>
-            <p id="displayBalance">$ 12,345.50</p>
-            <span style="opacity: 0.7;">Cuenta Nº: 001-456-789-0</span>
-        </div>
-
-        <h2 style="margin-top: 2rem; color: var(--color-text);">Operaciones Rápidas</h2>
-        <div class="actions-grid">
-            
-            <a href="/transaction" class="action-item">
-                <div class="icon icon-send"></div>
-                <h3>Realizar Transacción</h3>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Enviar dinero a otra cuenta.</p>
-            </a>
-            
-            <a href="/atm_simulator" class="action-item">
-                <div class="icon icon-atm"></div>
-                <h3>Cajero Automático</h3>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Depósitos y retiros rápidos.</p>
-            </a>
-
-            <a href="/history" class="action-item">
-                <div class="icon icon-history"></div>
-                <h3>Ver Historial</h3>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Revisar movimientos pasados.</p>
-            </a>
-            
-            <a href="/profile_settings" class="action-item">
-                <div class="icon icon-bank"></div>
-                <h3>Modificar Perfil</h3>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Cambiar DNI, email o contraseña.</p>
-            </a>
-            
-        </div>
+    <div class="balance-card">
+      <h2>Saldo Disponible</h2>
+      <p id="displayBalance">$ 0.00</p>
+      <span id="displayAccountNumber" style="opacity: 0.7;">Cuenta Nº: Cargando...</span>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const msgContainer = document.getElementById('message-container');
-            
-            // Lógica para capturar mensajes de la API (ej: después de una transacción)
-            if (params.has('success') || params.has('error')) {
-                const isError = params.has('error');
-                const message = params.get(isError ? 'error' : 'success').replace(/_/g, ' ');
-                const alertClass = isError ? 'alert-error' : 'alert-success';
+    <h2 style="margin-bottom: 1rem; color: var(--color-text);">Operaciones Rápidas</h2>
+    <div class="actions-grid">
+      <a href="transaction.html" class="action-item">
+        <div class="icon icon-send"></div>
+        <h3>Realizar Transacción</h3>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Enviar dinero a otra cuenta.</p>
+      </a>
 
-                msgContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
-            }
+      <a href="atm_simulator.html" class="action-item">
+        <div class="icon icon-atm"></div>
+        <h3>Cajero Automático</h3>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Depósitos y retiros rápidos.</p>
+      </a>
+
+      <a href="history.html" class="action-item">
+        <div class="icon icon-history"></div>
+        <h3>Ver Historial</h3>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Revisar movimientos pasados.</p>
+      </a>
+
+      <a href="profile_settings.html" class="action-item">
+        <div class="icon icon-bank"></div>
+        <h3>Modificar Perfil</h3>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Cambiar DNI, email o contraseña.</p>
+      </a>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <button id="btnDepositar" class="btn btn-primary">💰 Depositar $100</button>
+      <button id="btnRetirar" class="btn btn-secondary">💸 Retirar $50</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080/api';
+
+    function logout() {
+      sessionStorage.removeItem('user');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      let user = JSON.parse(sessionStorage.getItem('user'));
+
+      if (!user) {
+        alert('Sesión expirada o no iniciada.');
+        window.location.href = '/login.html';
+        return;
+      }
+
+      document.getElementById('userNameLink').innerText = `Perfil (${user.username})`;
+
+      // 🔹 Actualiza datos del usuario desde el backend
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/${user.id}`);
+        if (response.ok) {
+          user = await response.json();
+          sessionStorage.setItem('user', JSON.stringify(user));
+        }
+      } catch (error) {
+        console.warn('No se pudo refrescar el usuario:', error);
+      }
+
+      // 🔹 Mostrar cuenta bancaria
+      if (user.bankAccounts && user.bankAccounts.length > 0) {
+        const account = user.bankAccounts[0];
+        document.getElementById('displayAccountNumber').innerText = `Cuenta Nº: ${account.accountNumber}`;
+        document.getElementById('displayBalance').innerText = `$ ${account.balance.toFixed(2)}`;
+      } else {
+        document.getElementById('displayAccountNumber').innerText = 'No tienes cuentas asociadas';
+        document.getElementById('displayBalance').innerText = '$ 0.00';
+      }
+
+      // 🔹 Botones de prueba para depósito y retiro (simulan operaciones)
+      document.getElementById('btnDepositar').addEventListener('click', async () => {
+        const account = user.bankAccounts[0];
+        const amount = 100;
+        const response = await fetch(`${API_BASE_URL}/accounts/deposit`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accountId: account.id, amount })
         });
-    </script>
+
+        if (response.ok) {
+          const updated = await response.json();
+          alert(`Depósito exitoso. Nuevo saldo: $${updated.balance.toFixed(2)}`);
+          document.getElementById('displayBalance').innerText = `$ ${updated.balance.toFixed(2)}`;
+
+          // 🔸 Actualizar user en sesión
+          user.bankAccounts[0].balance = updated.balance;
+          sessionStorage.setItem('user', JSON.stringify(user));
+
+          // 🔸 Notificar al history.html
+          localStorage.setItem('updateHistory', Date.now());
+        } else {
+          alert('Error al realizar depósito');
+        }
+      });
+
+      document.getElementById('btnRetirar').addEventListener('click', async () => {
+        const account = user.bankAccounts[0];
+        const amount = 50;
+        const response = await fetch(`${API_BASE_URL}/accounts/withdraw`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accountId: account.id, amount })
+        });
+
+        if (response.ok) {
+          const updated = await response.json();
+          alert(`Retiro exitoso. Nuevo saldo: $${updated.balance.toFixed(2)}`);
+          document.getElementById('displayBalance').innerText = `$ ${updated.balance.toFixed(2)}`;
+
+          // 🔸 Actualizar user en sesión
+          user.bankAccounts[0].balance = updated.balance;
+          sessionStorage.setItem('user', JSON.stringify(user));
+
+          // 🔸 Notificar al history.html
+          localStorage.setItem('updateHistory', Date.now());
+        } else {
+          alert('Error al realizar retiro');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
+
+
+
+
+

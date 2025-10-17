@@ -1,66 +1,198 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realizar Transacción</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realizar Transacción | BANKO</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* 🎨 Mejoras visuales */
+    .card {
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      background: white;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert {
+      padding: 0.9rem 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 1rem;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .alert-success {
+      background-color: #e7f9ed;
+      color: #167b2e;
+      border: 1px solid #b9efc8;
+    }
+
+    .alert-error {
+      background-color: #fdecea;
+      color: #d93025;
+      border: 1px solid #f5b5ae;
+    }
+
+    .btn-secondary {
+      background-color: var(--color-secondary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn-secondary:hover {
+      background-color: #2740a0;
+    }
+
+    .loading {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--color-primary);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+  </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo"><a href="/dashboard">BANKO</a></div>
-        <div>
-            <a href="/dashboard">Volver al Dashboard</a>
-        </div>
-    </nav>
-
-    <div class="container" style="max-width: 600px;">
-        <div class="card">
-            <h2 style="color: var(--color-primary); margin-bottom: 1.5rem;">Transferencia a Terceros</h2>
-            
-            <div id="message-container" style="margin-bottom: 15px;"></div>
-
-            <form action="/transaction" method="POST">
-                
-                <input type="hidden" name="accountId" value="123456789"> 
-                <input type="hidden" name="type" value="transfer"> 
-                
-                <div class="form-group">
-                    <label for="recipientDni">DNI del Destinatario</label>
-                    <input type="text" id="recipientDni" placeholder="Identificación del beneficiario">
-                </div>
-                <div class="form-group">
-                    <label for="targetAccount">Número de Cuenta Destino</label>
-                    <input type="text" id="targetAccount" name="targetAccount" required placeholder="Ej: 001-987-654-3">
-                </div>
-                <div class="form-group">
-                    <label for="amount">Monto a Transferir ($)</label>
-                    <input type="number" id="amount" name="amount" required min="1.00" step="0.01" placeholder="Ej: 500.00">
-                </div>
-                <div class="form-group">
-                    <label for="description">Concepto/Descripción</label>
-                    <input type="text" id="description" placeholder="Ej: Pago de renta">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    Confirmar Transacción
-                </button>
-            </form>
-        </div>
+  <!-- ✅ Navbar -->
+  <nav class="navbar">
+    <div class="logo"><a href="dashboard.html">BANKO</a></div>
+    <div>
+      <a id="profileLink"></a>
+      <a href="#" id="logoutBtn">Cerrar Sesión</a>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const msgContainer = document.getElementById('message-container');
-            
-            if (params.has('success') || params.has('error')) {
-                const isError = params.has('error');
-                const message = params.get(isError ? 'error' : 'success').replace(/_/g, ' ');
-                const alertClass = isError ? 'alert-error' : 'alert-success';
+  </nav>
 
-                msgContainer.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
-            }
+  <!-- ✅ Contenedor principal -->
+  <div class="container" style="max-width: 500px;">
+    <div class="card">
+      <h2 style="color: var(--color-primary); margin-bottom: 1.5rem;">💸 Realizar Transacción</h2>
+      <div id="message-container"></div>
+
+      <form id="transactionForm">
+        <div class="form-group">
+          <label for="destinationAccount">Cuenta Destino</label>
+          <input type="text" id="destinationAccount" name="destinationAccount" required placeholder="Ej: 4544909176-70">
+        </div>
+        <div class="form-group">
+          <label for="amount">Monto a Transferir</label>
+          <input type="number" id="amount" name="amount" required min="1" placeholder="Ej: 100">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Enviar Dinero</button>
+        <div class="loading" id="loading"><div class="spinner"></div></div>
+      </form>
+
+      <button class="btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="window.location.href='dashboard.html'">
+        ← Volver al Dashboard
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080/api';
+    const msgContainer = document.getElementById('message-container');
+    const loadingSpinner = document.getElementById('loading');
+
+    // ✅ API Request genérico
+    async function apiRequest(endpoint, options = {}) {
+      const url = `${API_BASE_URL}${endpoint}`;
+      const response = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Error HTTP ${response.status}`);
+      }
+      return response.json();
+    }
+
+    // ✅ Cargar usuario logueado
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    if (!user) {
+      window.location.href = '/login.html';
+    }
+
+    document.getElementById('profileLink').textContent = `Perfil (${user.username})`;
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('user');
+      window.location.href = '/login.html';
+    });
+
+    // ✅ Envío de formulario con animación y UX mejorado
+    document.getElementById('transactionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msgContainer.innerHTML = '';
+      loadingSpinner.style.display = 'flex';
+
+      const destinationAccount = document.getElementById('destinationAccount').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const originAccount = user.bankAccounts[0]?.accountNumber;
+
+      if (!originAccount) {
+        loadingSpinner.style.display = 'none';
+        msgContainer.innerHTML = `<div class="alert alert-error">❌ No se encontró tu cuenta de origen.</div>`;
+        return;
+      }
+
+      if (destinationAccount === originAccount) {
+        loadingSpinner.style.display = 'none';
+        msgContainer.innerHTML = `<div class="alert alert-error">⚠️ No puedes transferirte dinero a tu propia cuenta.</div>`;
+        return;
+      }
+
+      try {
+        // 🔹 Retirar dinero
+        await apiRequest('/accounts/withdraw', {
+          method: 'PUT',
+          body: JSON.stringify({ accountNumber: originAccount, amount })
         });
-    </script>
+
+        // 🔹 Depositar dinero
+        await apiRequest('/accounts/deposit', {
+          method: 'PUT',
+          body: JSON.stringify({ accountNumber: destinationAccount, amount })
+        });
+
+        msgContainer.innerHTML = `<div class="alert alert-success">✅ Transacción realizada exitosamente. Tu saldo se actualizará al volver al panel.</div>`;
+        document.getElementById('transactionForm').reset();
+
+        // 🔹 Delay visual antes de volver al dashboard
+        setTimeout(() => window.location.href = 'dashboard.html', 2000);
+
+      } catch (error) {
+        console.error(error);
+        msgContainer.innerHTML = `<div class="alert alert-error">❌ Error al procesar la transacción: ${error.message}</div>`;
+      } finally {
+        loadingSpinner.style.display = 'none';
+      }
+    });
+  </script>
 </body>
 </html>

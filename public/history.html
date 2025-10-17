@@ -1,65 +1,177 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Transacciones</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historial de Transacciones</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      background-color: var(--color-bg-light);
+    }
+
+    .history-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      text-align: center;
+      padding: 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background-color: #f5f7fa;
+      font-weight: bold;
+      color: #333;
+    }
+
+    tr:hover {
+      background-color: #f9fbff;
+    }
+
+    .amount {
+      font-weight: bold;
+    }
+
+    .sent {
+      color: #e74c3c;
+    }
+
+    .received {
+      color: #2ecc71;
+    }
+
+    .error {
+      text-align: center;
+      padding: 1rem;
+      color: #e67e22;
+    }
+
+    .btn-back {
+      margin-top: 1.5rem;
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: var(--color-primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background-color: #004b91;
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo"><a href="dashboard.html">BANKO</a></div>
-        <div>
-            <a href="dashboard.html">Volver al Dashboard</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <h1 style="color: var(--color-primary); margin-bottom: 2rem;">Historial de Movimientos</h1>
-        
-        <div class="card" style="padding: 1rem;">
-            <table class="transaction-table">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Descripción</th>
-                        <th>Tipo</th>
-                        <th>Monto</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTableBody">
-                    </tbody>
-            </table>
-        </div>
+  <nav class="navbar">
+    <div class="logo"><a href="dashboard.html">BANKO</a></div>
+    <div>
+      <a href="profile_settings.html" id="userNameLink">Perfil</a>
+      <a href="login.html" onclick="logout()">Cerrar Sesión</a>
     </div>
+  </nav>
 
-    <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const historyData = getHistory();
-            const tableBody = document.getElementById('historyTableBody');
-            
-            if (historyData.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; opacity: 0.7; padding: 20px;">Aún no hay transacciones registradas.</td></tr>';
-                return;
-            }
+  <div class="history-container">
+    <h1 style="color: var(--color-primary);">Historial de Transacciones</h1>
 
-            historyData.forEach(tx => {
-                const amountValue = parseFloat(tx.amount);
-                const isCredit = amountValue >= 0;
-                const amountClass = isCredit ? 'credit' : 'debit';
-                const sign = isCredit ? '+ ' : '- ';
-                const displayAmount = Math.abs(amountValue).toFixed(2);
-                
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${tx.date}</td>
-                    <td>${tx.description}</td>
-                    <td>${tx.type}</td>
-                    <td class="${amountClass}">$ ${sign} ${displayAmount}</td>
-                `;
-            });
-        });
-    </script>
+    <p><strong>Cuenta N°</strong> <span id="accountNumber">Cargando...</span></p>
+    <p><strong>Saldo actual:</strong> <span id="currentBalance">$0.00</span></p>
+
+    <h3>Transacciones</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Monto</th>
+          <th>Fecha</th>
+          <th>Cuenta Contraria</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody id="transactionsBody">
+        <tr><td colspan="5">Cargando...</td></tr>
+      </tbody>
+    </table>
+
+    <a href="dashboard.html" class="btn-back">← Volver al Panel</a>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:8080/api';
+
+    function logout() {
+      sessionStorage.removeItem('user');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = JSON.parse(sessionStorage.getItem('user'));
+      const tbody = document.getElementById('transactionsBody');
+
+      if (!user) {
+        alert('Debes iniciar sesión primero.');
+        window.location.href = '/login.html';
+        return;
+      }
+
+      document.getElementById('userNameLink').innerText = `Perfil (${user.username})`;
+
+      if (!user.bankAccounts || user.bankAccounts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="error">No tienes cuentas asociadas.</td></tr>`;
+        return;
+      }
+
+      const account = user.bankAccounts[0];
+      const accountNumber = account.accountNumber;
+      document.getElementById('accountNumber').innerText = accountNumber;
+      document.getElementById('currentBalance').innerText = `$${account.balance.toFixed(2)}`;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/transactions/history/${accountNumber}`);
+        if (!response.ok) throw new Error('Error al obtener historial.');
+
+        const transactions = await response.json();
+        if (transactions.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="error">No hay transacciones registradas.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = transactions.map(tx => {
+          const tipo = tx.sourceAccountNumber === accountNumber ? 'Enviada' : 'Recibida';
+          const tipoClass = tipo === 'Enviada' ? 'sent' : 'received';
+          const cuentaContraria = tx.sourceAccountNumber === accountNumber ? (tx.targetAccountNumber || 'N/A') : tx.sourceAccountNumber;
+          const fecha = new Date(tx.transactionDate).toLocaleString('es-ES');
+          return `
+            <tr>
+              <td class="${tipoClass}">${tipo}</td>
+              <td class="amount">$${tx.amount.toFixed(2)}</td>
+              <td>${fecha}</td>
+              <td>${cuentaContraria || 'N/A'}</td>
+              <td>${tx.description || '—'}</td>
+            </tr>`;
+        }).join('');
+      } catch (error) {
+        console.error('Error al cargar transacciones:', error);
+        tbody.innerHTML = `<tr><td colspan="5" class="error">⚠️ Error al cargar transacciones.</td></tr>`;
+      }
+    });
+  </script>
 </body>
 </html>
+
+
+
+
+
