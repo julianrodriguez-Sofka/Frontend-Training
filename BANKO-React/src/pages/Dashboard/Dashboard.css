@@ -1,0 +1,47 @@
+.balance-card {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 2.5rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.balance-card h2 {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.balance-card p {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.action-item {
+    text-align: center;
+    padding: 1.5rem;
+    background-color: var(--color-card);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.action-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.icon {
+    font-size: 2rem;
+    color: var(--color-secondary);
+    margin-bottom: 0.5rem;
+}

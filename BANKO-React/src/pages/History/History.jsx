@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getHistory } from "../utils/bankUtils"; // función real del sistema
-import "../styles/styles.css"; // ruta correcta a la hoja de estilos
+import { getHistory } from "../../utils/bankUtils"; 
+import "./History.css"; 
 
 const History = () => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    const data = getHistory(); // obtiene transacciones desde localStorage
+    const data = getHistory(); 
     setTransactions(data);
   }, []);
 

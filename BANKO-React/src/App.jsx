@@ -1,15 +1,13 @@
-// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// Importa tus páginas
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Transaction from "./pages/Transaction";
-import AtmSimulator from "./pages/AtmSimulator";
-import History from "./pages/History";
-import ProfileSettings from "./pages/ProfileSettings";
+import Home from "./pages/Home/Home.jsx";
+import Login from "./pages/Login/Login.jsx";
+import Register from "./pages/Register/Register.jsx";
+import Dashboard from "./pages/Dashboard/Dashboard.jsx";
+import Transaction from "./pages/Transaction/Transaction.jsx";
+import AtmSimulator from "./pages/AtmSimulator/AtmSimulator.jsx";
+import History from "./pages/History/History.jsx";
+import ProfileSettings from "./pages/ProfileSettings/ProfileSettings.jsx";
 
 function App() {
   return (
@@ -34,3 +32,4 @@ function App() {
 }
 
 export default App;
+

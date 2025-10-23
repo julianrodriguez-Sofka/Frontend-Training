@@ -1,0 +1,13 @@
+.transaction-container {
+    max-width: 600px;
+    margin: 50px auto;
+}
+
+.transaction-container h2 {
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}

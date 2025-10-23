@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../styles/styles.css";
-import { getBalance, setBalance } from "../utils/bankUtils"; // ✅ importamos las funciones
-
+import "./Dashboard.css";
+import { getBalance, setBalance } from "../../utils/bankUtils"; 
 export default function Dashboard() {
   const [balance, setBalanceState] = useState(0);
 
   useEffect(() => {
-    // ✅ Obtener el balance desde bankUtils
     const currentBalance = getBalance();
 
-    // Si no hay balance en localStorage, inicializa con uno
     if (!currentBalance) {
       const initialBalance = 12345.5;
       setBalance(initialBalance);

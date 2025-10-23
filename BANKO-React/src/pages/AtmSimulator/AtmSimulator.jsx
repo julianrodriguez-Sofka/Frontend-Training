@@ -6,23 +6,20 @@ import {
   handleWithdrawal,
   recordTransaction,
   showAlert,
-} from "../utils/bankUtils";
-import "../styles/styles.css"; // ✅ Ruta correcta (asegúrate de que el archivo esté aquí)
-
+} from "../../utils/bankUtils";
+import "./AtmSimulator.css"; 
 const Corresponsal = () => {
   const [balance, setLocalBalance] = useState(0);
   const [pin, setPin] = useState(null);
   const [pinExpireTime, setPinExpireTime] = useState(null);
 
   useEffect(() => {
-    // Cargar saldo inicial desde localStorage (simulando backend)
     setLocalBalance(getBalance());
   }, []);
 
-  // 🔹 Genera un PIN aleatorio válido por 3 horas
   const generarPin = () => {
     const nuevoPin = Math.floor(100000 + Math.random() * 900000);
-    const expiracion = Date.now() + 3 * 60 * 60 * 1000; // 3 horas
+    const expiracion = Date.now() + 3 * 60 * 60 * 1000; 
     setPin(nuevoPin);
     setPinExpireTime(expiracion);
     return nuevoPin;

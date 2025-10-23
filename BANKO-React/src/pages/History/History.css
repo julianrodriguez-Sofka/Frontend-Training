@@ -1,0 +1,33 @@
+.history-container {
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.transaction-table th,
+.transaction-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.transaction-table th {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-weight: 600;
+}
+
+.credit {
+    color: var(--color-success);
+    font-weight: 700;
+}
+
+.debit {
+    color: var(--color-danger);
+    font-weight: 700;
+}

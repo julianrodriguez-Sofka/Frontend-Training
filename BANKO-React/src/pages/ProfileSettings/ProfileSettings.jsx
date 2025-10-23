@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import "../styles/styles.css"; // ✅ ruta corregida a la carpeta de estilos
-
-// Más adelante conectaremos estas funciones reales desde bankUtils.js:
-// import { updateUserProfile, changePassword } from "../utils/bankUtils";
+import "./ProfileSettings.css"; 
 
 const ProfileSettings = () => {
   const [profile, setProfile] = useState({
@@ -18,7 +15,6 @@ const ProfileSettings = () => {
     confirmNewPassword: "",
   });
 
-  // 🔹 Manejadores de cambios
   const handleProfileChange = (e) => {
     const { id, value } = e.target;
     setProfile((prev) => ({ ...prev, [id]: value }));
@@ -29,14 +25,12 @@ const ProfileSettings = () => {
     setPasswords((prev) => ({ ...prev, [id]: value }));
   };
 
-  // 🔹 Simula actualizar perfil (luego se usará bankUtils)
   const handleProfileSubmit = (e) => {
     e.preventDefault();
     console.log("Datos actualizados:", profile);
     alert("✅ Cambios guardados con éxito (simulado).");
   };
 
-  // 🔹 Simula cambiar contraseña (luego se usará bankUtils)
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     if (passwords.newPassword !== passwords.confirmNewPassword) {

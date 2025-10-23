@@ -1,0 +1,19 @@
+.profile-settings-container {
+    max-width: 500px;
+    margin: 50px auto;
+    background-color: var(--color-white);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-settings-container h2 {
+    text-align: center;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+}
+
+.profile-settings-container .btn-primary {
+    width: 100%;
+    margin-top: 1rem;
+}

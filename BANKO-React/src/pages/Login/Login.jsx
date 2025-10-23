@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/styles.css"; // ✅ ruta corregida
+import "./Login.css"; 
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -17,12 +17,11 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 🔹 Simulación de login (luego conectaremos con la API)
     console.log("Intentando iniciar sesión con:", formData);
 
     if (formData.email && formData.password) {
       alert("✅ Inicio de sesión exitoso (simulado)");
-      window.location.href = "/dashboard"; // redirección temporal
+      window.location.href = "/dashboard"; 
     } else {
       alert("❌ Por favor completa todos los campos");
     }

@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import "../styles/styles.css"; // ✅ corregido para apuntar a la carpeta "styles"
-// Más adelante se importará esto cuando conectemos con el backend:
-// import { registerUser } from "../utils/bankUtils";
-
+import "./Register.css"; 
 const Register = () => {
   const [formData, setFormData] = useState({
     dni: "",
@@ -11,13 +8,11 @@ const Register = () => {
     password: "",
   });
 
-  // 🔹 Maneja los cambios del formulario
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  // 🔹 Simula el envío del registro (luego se reemplaza por la API)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -29,7 +24,6 @@ const Register = () => {
     try {
       console.log("Datos enviados al servidor (simulado):", formData);
 
-      // Más adelante: await registerUser(formData);
 
       alert("✅ Registro exitoso (simulado). Redirigiendo al inicio de sesión...");
       setFormData({ dni: "", username: "", email: "", password: "" });

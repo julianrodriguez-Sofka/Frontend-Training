@@ -1,0 +1,24 @@
+.login-container {
+    max-width: 400px;
+    margin: 80px auto;
+    background-color: var(--color-white);
+    padding: 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+    text-align: center;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+}
+
+.login-container .btn-primary {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.login-container p {
+    text-align: center;
+    margin-top: 1rem;
+}

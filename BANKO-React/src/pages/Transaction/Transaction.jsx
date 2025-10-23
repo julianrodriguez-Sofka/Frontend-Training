@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import "../styles/styles.css"; // ✅ Corrección de ruta
-// import { transferFunds } from "../utils/bankUtils"; // 🔹 se activará cuando conectemos con la API
-
+import "./Transaction.css"; 
 const Transaction = () => {
   const [formData, setFormData] = useState({
     recipientDni: "",
@@ -13,13 +11,11 @@ const Transaction = () => {
   const [message, setMessage] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // 🔹 Maneja los cambios en los campos del formulario
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  // 🔹 Simulación de transferencia (luego se reemplazará por bankUtils.transferFunds)
   const handleTransfer = (amount, recipientDni) => {
     if (amount > 0 && recipientDni.trim() !== "") {
       return { success: true };
@@ -28,7 +24,6 @@ const Transaction = () => {
     }
   };
 
-  // 🔹 Envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { amount, recipientDni } = formData;
@@ -36,8 +31,7 @@ const Transaction = () => {
 
     if (parsedAmount > 0 && recipientDni.trim() !== "") {
       try {
-        // Más adelante reemplazaremos esta línea por:
-        // const result = await transferFunds(formData);
+        
         const result = handleTransfer(parsedAmount, recipientDni);
 
         if (result.success) {
@@ -46,7 +40,6 @@ const Transaction = () => {
             `✅ Transferencia de $${parsedAmount.toFixed(2)} enviada con éxito a DNI ${recipientDni}.`
           );
 
-          // Limpia los campos tras éxito
           setFormData({
             recipientDni: "",
             accountNumber: "",
@@ -54,7 +47,6 @@ const Transaction = () => {
             description: "",
           });
 
-          // Redirección simulada
           setTimeout(() => {
             window.location.href = "/dashboard";
           }, 2000);
