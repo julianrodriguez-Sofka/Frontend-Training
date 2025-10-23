@@ -1,21 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Dashboard.css";
-import { getBalance, setBalance } from "../../utils/bankUtils"; 
+import { getUserById } from "../../services/userService";
+
 export default function Dashboard() {
-  const [balance, setBalanceState] = useState(0);
+  const [user, setUser] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const currentBalance = getBalance();
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
 
-    if (!currentBalance) {
-      const initialBalance = 12345.5;
-      setBalance(initialBalance);
-      setBalanceState(initialBalance);
-    } else {
-      setBalanceState(currentBalance);
-    }
+        if (!userId) {
+          setError("No se encontró el usuario. Inicia sesión nuevamente.");
+          setLoading(false);
+          return;
+        }
+
+        const userData = await getUserById(userId);
+        setUser(userData);
+
+        // Si el usuario tiene cuentas bancarias, usa el saldo de la primera
+        if (userData.bankAccounts && userData.bankAccounts.length > 0) {
+          setBalance(userData.bankAccounts[0].balance || 0);
+        }
+
+      } catch (err) {
+        console.error("❌ Error al cargar datos del usuario:", err);
+        setError("No se pudieron cargar los datos del usuario.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="container" style={{ textAlign: "center", marginTop: "5rem" }}>
+        <h2 style={{ color: "var(--color-primary)" }}>Cargando tu panel...</h2>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container" style={{ textAlign: "center", marginTop: "5rem" }}>
+        <h2 style={{ color: "red" }}>{error}</h2>
+        <Link to="/login" className="btn btn-primary" style={{ marginTop: "1rem" }}>
+          Ir al inicio de sesión
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -25,11 +66,16 @@ export default function Dashboard() {
           <Link to="/dashboard">BANKO</Link>
         </div>
         <div>
-          <a href="#">Perfil (Usuario Test)</a>
-          <Link to="/">Cerrar Sesión</Link>
+          <span style={{ marginRight: "1rem", color: "var(--color-text)" }}>
+            👤 {user?.username || "Usuario"}
+          </span>
+          <Link to="/" onClick={() => localStorage.clear()}>
+            Cerrar Sesión
+          </Link>
         </div>
       </nav>
 
+      {/* Contenido principal */}
       <div className="container">
         <header>
           <h1 style={{ color: "var(--color-primary)", marginBottom: "2rem" }}>
@@ -40,7 +86,12 @@ export default function Dashboard() {
         <div className="balance-card">
           <h2>Saldo Disponible</h2>
           <p id="displayBalance">$ {balance.toFixed(2)}</p>
-          <span style={{ opacity: 0.7 }}>Cuenta Nº: 001-456-789-0</span>
+          <span style={{ opacity: 0.7 }}>
+            Cuenta Nº:{" "}
+            {user?.bankAccounts && user.bankAccounts.length > 0
+              ? user.bankAccounts[0].accountNumber
+              : "Sin cuenta registrada"}
+          </span>
         </div>
 
         <h2 style={{ marginBottom: "1rem", color: "var(--color-text)" }}>
@@ -84,3 +135,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+

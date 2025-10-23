@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./Login.css"; 
+import { useLogin } from "../../hooks/useLogin";
+import "./Login.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -7,29 +8,32 @@ const Login = () => {
     password: "",
   });
 
+  const { handleLogin, loading, error, success } = useLogin();
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Intentando iniciar sesión con:", formData);
+    if (!formData.email || !formData.password) {
+      alert("⚠️ Por favor completa todos los campos.");
+      return;
+    }
 
-    if (formData.email && formData.password) {
-      alert("✅ Inicio de sesión exitoso (simulado)");
-      window.location.href = "/dashboard"; 
-    } else {
-      alert("❌ Por favor completa todos los campos");
+    const loggedIn = await handleLogin(formData);
+
+    if (loggedIn) {
+      // Si el login es exitoso, redirige al Dashboard
+      setTimeout(() => (window.location.href = "/dashboard"), 1000);
     }
   };
 
   return (
     <>
-      {/* NAVBAR */}
+      {/* Navbar */}
       <nav className="navbar">
         <div className="logo">
           <a href="/">BANKO</a>
@@ -39,17 +43,11 @@ const Login = () => {
         </div>
       </nav>
 
-      {/* FORMULARIO LOGIN */}
-      <div className="container" style={{ maxWidth: "400px" }}>
+      {/* Formulario de Login */}
+      <div className="container" style={{ maxWidth: "450px" }}>
         <div className="card">
-          <h2
-            style={{
-              color: "var(--color-primary)",
-              marginBottom: "1.5rem",
-              textAlign: "center",
-            }}
-          >
-            Acceso a Clientes
+          <h2 style={{ color: "var(--color-primary)", marginBottom: "1.5rem" }}>
+            Inicia Sesión
           </h2>
 
           <form onSubmit={handleSubmit}>
@@ -59,7 +57,7 @@ const Login = () => {
                 type="email"
                 id="email"
                 required
-                placeholder="tu.correo@banco.com"
+                placeholder="ejemplo@correo.com"
                 value={formData.email}
                 onChange={handleChange}
               />
@@ -81,23 +79,25 @@ const Login = () => {
               type="submit"
               className="btn btn-primary"
               style={{ width: "100%" }}
+              disabled={loading}
             >
-              Iniciar Sesión
+              {loading ? "Ingresando..." : "Iniciar Sesión"}
             </button>
           </form>
 
-          <p
-            style={{
-              marginTop: "1rem",
-              textAlign: "center",
-              fontSize: "0.9rem",
-            }}
-          >
-            ¿Aún no tienes cuenta?{" "}
-            <a href="/register" style={{ color: "var(--color-secondary)" }}>
-              Regístrate aquí
-            </a>
-          </p>
+          {/* Mensajes dinámicos */}
+          {error && (
+            <p style={{ color: "red", marginTop: "1rem", textAlign: "center" }}>
+              ❌ {error}
+            </p>
+          )}
+          {success && (
+            <p
+              style={{ color: "green", marginTop: "1rem", textAlign: "center" }}
+            >
+              ✅ Inicio de sesión exitoso
+            </p>
+          )}
         </div>
       </div>
     </>
@@ -105,4 +105,6 @@ const Login = () => {
 };
 
 export default Login;
+
+
 

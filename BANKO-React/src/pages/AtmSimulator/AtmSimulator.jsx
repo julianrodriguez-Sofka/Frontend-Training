@@ -1,182 +1,206 @@
-import React, { useState, useEffect } from "react";
-import {
-  getBalance,
-  setBalance,
-  handleDeposit,
-  handleWithdrawal,
-  recordTransaction,
-  showAlert,
-} from "../../utils/bankUtils";
-import "./AtmSimulator.css"; 
-const Corresponsal = () => {
-  const [balance, setLocalBalance] = useState(0);
-  const [pin, setPin] = useState(null);
-  const [pinExpireTime, setPinExpireTime] = useState(null);
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./AtmSimulator.css";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = "http://localhost:8080/api/accounts";
+
+const AtmSimulator = () => {
+  const [account, setAccount] = useState(null);
+  const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [user, setUser] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setLocalBalance(getBalance());
+    const userData = localStorage.getItem("user");
+    if (!userData) {
+      setError("No se encontró información del usuario logeado.");
+      setLoading(false);
+      return;
+    }
+
+    const parsedUser = JSON.parse(userData);
+    setUser(parsedUser);
+
+    axios
+      .get(`${API_URL}/user/${parsedUser.id}`)
+      .then((res) => {
+        setAccount(res.data);
+
+        const allTransactions = [
+          ...(res.data.outgoingTransactions || []).map((t) => ({
+            ...t,
+            type: "Salida",
+          })),
+          ...(res.data.incomingTransactions || []).map((t) => ({
+            ...t,
+            type: "Entrada",
+          })),
+        ];
+
+        const sorted = allTransactions
+          .sort(
+            (a, b) => new Date(b.transactionDate) - new Date(a.transactionDate)
+          )
+          .slice(0, 5);
+
+        setTransactions(sorted);
+      })
+      .catch(() => setError("No se pudo obtener la cuenta bancaria."))
+      .finally(() => setLoading(false));
   }, []);
 
-  const generarPin = () => {
-    const nuevoPin = Math.floor(100000 + Math.random() * 900000);
-    const expiracion = Date.now() + 3 * 60 * 60 * 1000; 
-    setPin(nuevoPin);
-    setPinExpireTime(expiracion);
-    return nuevoPin;
+  const handleAmountChange = (e) => {
+    setAmount(e.target.value);
+    setMessage("");
+    setError("");
   };
 
-  // 🔹 DEPÓSITO
-  const handleDeposito = (e) => {
-    e.preventDefault();
-    const amount = parseFloat(e.target.depositAmount.value);
-
-    if (isNaN(amount) || amount <= 0) {
-      showAlert("⚠️ El monto debe ser mayor a cero.", false);
+  const performOperation = async (operation) => {
+    if (!amount || parseFloat(amount) <= 0) {
+      setError("Ingrese un monto válido.");
       return;
     }
 
-    const nuevoPin = generarPin();
-    const nuevoBalance = handleDeposit(amount);
-    setLocalBalance(nuevoBalance);
-    recordTransaction("Depósito Corresponsal", amount, "Depósito autorizado en corresponsal");
-    showAlert(
-      `✅ Depósito de $${amount.toFixed(2)} generado. PIN ${nuevoPin} válido por 3 horas.`,
-      true
+    const endpoint = `${API_URL}/${operation}`;
+    const payload = {
+      accountNumber: account.accountNumber,
+      amount: parseFloat(amount),
+    };
+
+    try {
+      const res = await axios.put(endpoint, payload);
+      setAccount(res.data);
+      setMessage(
+        `${operation === "deposit" ? "Depósito" : "Retiro"} exitoso de $${amount}`
+      );
+      setAmount("");
+
+      const newTransaction = {
+        amount: parseFloat(amount),
+        description:
+          operation === "deposit"
+            ? `Depósito a cuenta ${account.accountNumber}`
+            : `Retiro de cuenta ${account.accountNumber}`,
+        transactionDate: new Date().toISOString(),
+        type: operation === "deposit" ? "Entrada" : "Salida",
+      };
+
+      setTransactions((prev) => [newTransaction, ...prev].slice(0, 5));
+    } catch (err) {
+      setError(
+        operation === "withdraw"
+          ? "Fondos insuficientes o error en el retiro."
+          : "Error al realizar el depósito."
+      );
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="atm-loading">
+        <div className="loader"></div>
+        <p>Cargando cajero...</p>
+      </div>
     );
-    e.target.reset();
-  };
 
-  // 🔹 RETIRO
-  const handleRetiro = (e) => {
-    e.preventDefault();
-    const amount = parseFloat(e.target.withdrawAmount.value);
-    const inputPin = e.target.withdrawPin.value;
-
-    if (!pin || Date.now() > pinExpireTime) {
-      showAlert("❌ No hay un PIN activo o ha expirado. Genera uno nuevo con un depósito.", false);
-      return;
-    }
-
-    if (inputPin !== pin.toString()) {
-      showAlert("⚠️ El PIN ingresado no es válido.", false);
-      return;
-    }
-
-    if (isNaN(amount) || amount <= 0) {
-      showAlert("⚠️ El monto debe ser mayor a cero.", false);
-      return;
-    }
-
-    const result = handleWithdrawal(amount);
-    if (result.success) {
-      setLocalBalance(result.newBalance);
-      recordTransaction("Retiro Corresponsal", -amount, "Retiro en corresponsal autorizado");
-      showAlert(`💰 Retiro de $${amount.toFixed(2)} completado correctamente.`, true);
-      setPin(null);
-      e.target.reset();
-    } else {
-      showAlert(result.message, false);
-    }
-  };
+  if (error)
+    return (
+      <div className="atm-error">
+        <h2>⚠️ Error</h2>
+        <p>{error}</p>
+        <button className="btn-bank" onClick={() => navigate("/dashboard")}>
+          ← BANKO
+        </button>
+      </div>
+    );
 
   return (
-    <>
-      <nav className="navbar">
-        <div className="logo">
-          <a href="/dashboard">BANKO</a>
-        </div>
-        <div>
-          <a href="/dashboard">Volver al Dashboard</a>
-        </div>
-      </nav>
-
-      <div className="container" style={{ maxWidth: "800px" }}>
-        <h1
-          style={{
-            color: "var(--color-primary)",
-            marginBottom: "2rem",
-            textAlign: "center",
-          }}
-        >
-          Corresponsal Bancario – Depósitos y Retiros
-        </h1>
-
-        <div className="balance-card" style={{ padding: "1.5rem", marginBottom: 30 }}>
-          <h2 style={{ fontSize: "1.1rem" }}>
-            Tu Saldo Actual:{" "}
-            <span id="currentBalance" style={{ fontSize: "1.8rem" }}>
-              ${balance.toFixed(2)}
-            </span>
-          </h2>
+    <div className="atm-page">
+      <div className="atm-container">
+        <div className="atm-header">
+          <button className="btn-bank" onClick={() => navigate("/dashboard")}>
+            ← BANKO
+          </button>
+          <h1>💳 Simulador de Cajero</h1>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px" }}>
-          {/* DEPÓSITO */}
-          <div className="card">
-            <h3 style={{ color: "var(--color-success)", marginBottom: "1.5rem" }}>
-              Realizar Depósito
-            </h3>
-            <form id="depositForm" onSubmit={handleDeposito}>
-              <div className="form-group">
-                <label htmlFor="depositAmount">Monto a Depositar ($)</label>
-                <input
-                  type="number"
-                  name="depositAmount"
-                  required
-                  min="1.00"
-                  step="0.01"
-                  placeholder="Ej: 500.00"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="depositRef">Referencia (Opcional)</label>
-                <input
-                  type="text"
-                  name="depositRef"
-                  placeholder="Ej: Venta de artículo"
-                />
-              </div>
-              <button type="submit" className="btn btn-success" style={{ width: "100%" }}>
-                Generar PIN de Depósito
-              </button>
-            </form>
+        <div className="atm-card">
+          <div className="atm-user-info">
+            <span className="atm-user">👤 {user?.username || "Usuario"}</span>
+            <p>
+              <strong>N° de cuenta:</strong> {account.accountNumber}
+            </p>
+            <p>
+              <strong>Saldo actual:</strong>{" "}
+              <span className="atm-balance">${account.balance.toFixed(2)}</span>
+            </p>
           </div>
 
-          {/* RETIRO */}
-          <div className="card">
-            <h3 style={{ color: "var(--color-danger)", marginBottom: "1.5rem" }}>
-              Realizar Retiro
-            </h3>
-            <form id="withdrawForm" onSubmit={handleRetiro}>
-              <div className="form-group">
-                <label htmlFor="withdrawAmount">Monto a Retirar ($)</label>
-                <input
-                  type="number"
-                  name="withdrawAmount"
-                  required
-                  min="1.00"
-                  step="0.01"
-                  placeholder="Ej: 200.00"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="withdrawPin">PIN de Seguridad</label>
-                <input
-                  type="password"
-                  name="withdrawPin"
-                  required
-                  placeholder="Tu PIN generado"
-                />
-              </div>
-              <button type="submit" className="btn btn-danger" style={{ width: "100%" }}>
-                Retirar Dinero
-              </button>
-            </form>
+          <div className="atm-input-section">
+            <label>Monto a operar</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={handleAmountChange}
+              placeholder="Ingrese el monto"
+            />
+          </div>
+
+          <div className="atm-actions">
+            <button className="btn deposit" onClick={() => performOperation("deposit")}>
+              Depositar
+            </button>
+            <button className="btn withdraw" onClick={() => performOperation("withdraw")}>
+              Retirar
+            </button>
+          </div>
+
+          {message && <p className="atm-success">{message}</p>}
+          {error && <p className="atm-error-text">{error}</p>}
+
+          <div className="atm-history">
+            <h2>Historial reciente</h2>
+            {transactions.length === 0 ? (
+              <p className="empty-history">No hay movimientos aún.</p>
+            ) : (
+              <ul>
+                {transactions.map((t, index) => (
+                  <li key={index} className={`transaction ${t.type.toLowerCase()}`}>
+                    <div className="transaction-info">
+                      <span className="transaction-type">
+                        {t.type === "Entrada" ? "⬆️ Depósito" : "⬇️ Retiro"}
+                      </span>
+                      <span className="transaction-date">
+                        {new Date(t.transactionDate).toLocaleDateString("es-CO", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                    <div
+                      className={`transaction-amount ${
+                        t.type === "Entrada" ? "in" : "out"
+                      }`}
+                    >
+                      {t.type === "Entrada" ? "+" : "-"}${t.amount.toFixed(2)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default Corresponsal;
+export default AtmSimulator;

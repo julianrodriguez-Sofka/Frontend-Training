@@ -1,81 +1,91 @@
-import React, { useEffect, useState } from "react";
-import { getHistory } from "../../utils/bankUtils"; 
-import "./History.css"; 
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./History.css";
+import { getTransactionHistory } from "../../services/historyService";
 
-const History = () => {
+export default function History() {
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const data = getHistory(); 
-    setTransactions(data);
-  }, []);
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser) {
+      navigate("/");
+      return;
+    }
+    setUser(storedUser);
+
+    const fetchHistory = async () => {
+      try {
+        const response = await getTransactionHistory(storedUser.accountNumber);
+        setTransactions(response);
+      } catch (error) {
+        console.error("Error al obtener historial:", error);
+      }
+    };
+
+    fetchHistory();
+  }, [navigate]);
 
   return (
-    <>
+    <div>
+      {/* NAV */}
       <nav className="navbar">
         <div className="logo">
-          <a href="/dashboard">BANKO</a>
+          <Link to="/dashboard">BANKO</Link>
         </div>
         <div>
-          <a href="/dashboard">Volver al Dashboard</a>
+          <span>Perfil ({user?.username || "Usuario"})</span>
+          <Link to="/">Cerrar Sesión</Link>
         </div>
       </nav>
 
       <div className="container">
         <h1 style={{ color: "var(--color-primary)", marginBottom: "2rem" }}>
-          Historial de Movimientos
+          Historial de Transacciones
         </h1>
 
-        <div className="card" style={{ padding: "1rem" }}>
-          <table className="transaction-table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Descripción</th>
-                <th>Tipo</th>
-                <th>Monto</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.length === 0 ? (
+        <div className="history-card">
+          {transactions.length === 0 ? (
+            <p style={{ opacity: 0.7 }}>No hay transacciones registradas.</p>
+          ) : (
+            <table className="history-table">
+              <thead>
                 <tr>
-                  <td
-                    colSpan="4"
-                    style={{
-                      textAlign: "center",
-                      opacity: 0.7,
-                      padding: "20px",
-                    }}
-                  >
-                    Aún no hay transacciones registradas.
-                  </td>
+                  <th>Fecha</th>
+                  <th>Descripción</th>
+                  <th>Monto</th>
+                  <th>Cuenta Destino</th>
                 </tr>
-              ) : (
-                transactions.map((tx, index) => {
-                  const isCredit = parseFloat(tx.amount) >= 0;
-                  const amountClass = isCredit ? "credit" : "debit";
-                  const sign = isCredit ? "+ " : "- ";
-                  const displayAmount = Math.abs(tx.amount).toFixed(2);
-
-                  return (
-                    <tr key={index}>
-                      <td>{tx.date}</td>
-                      <td>{tx.description}</td>
-                      <td>{tx.type}</td>
-                      <td className={amountClass}>
-                        {sign}${displayAmount}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {transactions.map((tx) => (
+                  <tr key={tx.id}>
+                    <td>{new Date(tx.transactionDate).toLocaleString()}</td>
+                    <td>{tx.description}</td>
+                    <td
+                      style={{
+                        color:
+                          tx.sourceAccountNumber === user?.accountNumber
+                            ? "red"
+                            : "green",
+                      }}
+                    >
+                      {tx.sourceAccountNumber === user?.accountNumber
+                        ? `- $${tx.amount.toFixed(2)}`
+                        : `+ $${tx.amount.toFixed(2)}`}
+                    </td>
+                    <td>{tx.targetAccountNumber}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
-};
+}
 
-export default History;
 

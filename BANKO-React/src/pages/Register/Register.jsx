@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import "./Register.css"; 
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRegister } from "../../hooks/useRegister";
+import "./Register.css";
+
 const Register = () => {
   const [formData, setFormData] = useState({
     dni: "",
@@ -7,6 +10,9 @@ const Register = () => {
     email: "",
     password: "",
   });
+
+  const { handleRegister, loading, error, success } = useRegister();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -21,25 +27,21 @@ const Register = () => {
       return;
     }
 
-    try {
-      console.log("Datos enviados al servidor (simulado):", formData);
-
-
-      alert("✅ Registro exitoso (simulado). Redirigiendo al inicio de sesión...");
-      setFormData({ dni: "", username: "", email: "", password: "" });
-
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1200);
-    } catch (error) {
-      console.error("Error en el registro:", error);
-      alert("❌ Ocurrió un error durante el registro.");
-    }
+    await handleRegister(formData);
   };
+
+  // ✅ Redirige automáticamente cuando el registro fue exitoso
+  useEffect(() => {
+    if (success) {
+      setTimeout(() => {
+        navigate("/login", { state: { fromRegister: true } });
+      }, 1000);
+    }
+  }, [success, navigate]);
 
   return (
     <>
-      {/* Barra de navegación */}
+      {/* Navbar */}
       <nav className="navbar">
         <div className="logo">
           <a href="/">BANKO</a>
@@ -49,7 +51,7 @@ const Register = () => {
         </div>
       </nav>
 
-      {/* Formulario de registro */}
+      {/* Formulario */}
       <div className="container" style={{ maxWidth: "500px" }}>
         <div className="card">
           <h2 style={{ color: "var(--color-primary)", marginBottom: "1.5rem" }}>
@@ -109,10 +111,15 @@ const Register = () => {
               type="submit"
               className="btn btn-primary"
               style={{ width: "100%" }}
+              disabled={loading}
             >
-              Registrarse y Abrir Cuenta
+              {loading ? "Registrando..." : "Registrarse y Abrir Cuenta"}
             </button>
           </form>
+
+          {/* Mensajes de estado */}
+          {error && <p style={{ color: "red", marginTop: "1rem" }}>❌ {error}</p>}
+          {success && <p style={{ color: "green", marginTop: "1rem" }}>✅ Registro exitoso</p>}
         </div>
       </div>
     </>

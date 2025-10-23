@@ -1,20 +1,139 @@
-.atm-container {
-    max-width: 500px;
-    margin: 50px auto;
-    background-color: var(--color-white);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.atm-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0047ab, #007bff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 }
 
-.atm-container h2 {
-    text-align: center;
-    color: var(--color-primary);
-    margin-bottom: 1.5rem;
+.atm-container {
+  width: 95%;
+  max-width: 800px;
+}
+
+.atm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.btn-bank {
+  background: white;
+  color: #0047ab;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-bank:hover {
+  background: #f0f0f0;
+}
+
+.atm-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.atm-user-info {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.atm-balance {
+  color: #007bff;
+  font-weight: 700;
+}
+
+.atm-input-section {
+  margin: 1.2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.atm-input-section input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
 .atm-actions {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
+
+.btn {
+  flex: 1;
+  padding: 0.7rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 600;
+}
+
+.deposit {
+  background: #28a745;
+  color: white;
+}
+
+.withdraw {
+  background: #dc3545;
+  color: white;
+}
+
+.deposit:hover {
+  background: #23923e;
+}
+
+.withdraw:hover {
+  background: #b92f3b;
+}
+
+.atm-success {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.atm-error-text {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.atm-history {
+  margin-top: 2rem;
+}
+
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.transaction.in .transaction-amount {
+  color: #28a745;
+}
+
+.transaction.out .transaction-amount {
+  color: #dc3545;
+}
+
+.empty-history {
+  color: #666;
+  text-align: center;
+}
+
+
+

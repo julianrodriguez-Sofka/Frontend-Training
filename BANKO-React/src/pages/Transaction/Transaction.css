@@ -1,13 +1,180 @@
-.transaction-container {
-    max-width: 600px;
-    margin: 50px auto;
+:root {
+  --color-primary: #004aad;
+  --color-secondary: #1c1c2e;
+  --color-bg: #f5f7fb;
+  --color-white: #ffffff;
+  --color-success: #00b894;
+  --color-error: #e74c3c;
+  --radius: 12px;
+  --transition: all 0.3s ease;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.transaction-container h2 {
-    color: var(--color-primary);
-    margin-bottom: 1rem;
+/* ======== NAVBAR ======== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 1rem 2rem;
+  box-shadow: var(--shadow);
+}
+
+.navbar .logo a {
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: 1.4rem;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.navbar div span {
+  margin-right: 1.2rem;
+  font-weight: 500;
+}
+
+.navbar a {
+  color: var(--color-white);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.navbar a:hover {
+  opacity: 0.85;
+}
+
+/* ======== CONTAINER ======== */
+.container {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 2.5rem 3rem;
+  background: var(--color-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.container h1 {
+  font-size: 1.8rem;
+  color: var(--color-primary);
+  margin-bottom: 2rem;
+  font-weight: 700;
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 0.5rem;
+}
+
+/* ======== FORM ======== */
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
 }
 
 .form-group {
-    margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--color-secondary);
+  margin-bottom: 0.6rem;
+}
+
+.form-group input {
+  padding: 0.9rem 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--radius);
+  background: #f9f9fb;
+  color: #333;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.1);
+}
+
+/* Readonly field */
+.form-group input[readonly] {
+  background: #e9edf5;
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* ======== BUTTON ======== */
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 600;
+  padding: 0.9rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 74, 173, 0.15);
+}
+
+.btn-primary:hover {
+  background: #003580;
+  transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+  background: #a0b7e0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ======== MESSAGES ======== */
+.transaction-message {
+  margin-top: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.transaction-message::before {
+  content: "ℹ️ ";
+}
+
+.transaction-message:contains("✅") {
+  color: var(--color-success);
+}
+
+.transaction-message:contains("❌") {
+  color: var(--color-error);
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+  .container {
+    margin: 2rem 1rem;
+    padding: 2rem;
+  }
+
+  .container h1 {
+    font-size: 1.6rem;
+  }
+
+  .btn-primary {
+    font-size: 0.95rem;
+  }
+}
+
+/* ======== ANIMATIONS ======== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
