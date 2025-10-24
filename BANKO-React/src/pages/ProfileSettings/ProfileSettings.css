@@ -1,19 +1,152 @@
 .profile-settings-container {
-    max-width: 500px;
-    margin: 50px auto;
-    background-color: var(--color-white);
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: 100vh;
+  background-color: #0a1d56;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  font-family: "Poppins", sans-serif;
 }
 
-.profile-settings-container h2 {
-    text-align: center;
-    color: var(--color-primary);
-    margin-bottom: 1.5rem;
+/* --- Botón BANKO --- */
+.banko-button {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  background-color: #fff;
+  color: #0a1d56;
+  border: none;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
-.profile-settings-container .btn-primary {
-    width: 100%;
-    margin-top: 1rem;
+.banko-button:hover {
+  background-color: #e9eefb;
+  transform: scale(1.05);
 }
+
+/* --- Tarjeta principal --- */
+.profile-card {
+  background-color: #fff;
+  padding: 40px 50px;
+  border-radius: 18px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.profile-card h2 {
+  color: #0a1d56;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* --- Formulario --- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.form-group label {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 2px solid #d3d3d3;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #0a1d56;
+  box-shadow: 0 0 5px rgba(10, 29, 86, 0.3);
+}
+
+/* --- Botón de guardar --- */
+.save-button {
+  width: 100%;
+  background-color: #0a1d56;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #102b83;
+  transform: translateY(-2px);
+}
+
+/* --- Notificaciones --- */
+.notification {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  padding: 15px 25px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  animation: slideIn 0.4s ease, fadeOut 0.4s ease 3.1s forwards;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.notification.success {
+  background-color: #16a34a; /* verde éxito */
+}
+
+.notification.error {
+  background-color: #dc2626; /* rojo error */
+}
+
+/* Animaciones */
+@keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(120%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+

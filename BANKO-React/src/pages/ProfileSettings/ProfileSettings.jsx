@@ -1,195 +1,150 @@
-import React, { useState } from "react";
-import "./ProfileSettings.css"; 
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./ProfileSettings.css";
+import { useNavigate } from "react-router-dom";
 
 const ProfileSettings = () => {
-  const [profile, setProfile] = useState({
-    userId: "TEST_ID_1",
-    dni: "98765432Y",
-    username: "NewName",
-    email: "test@bank.com",
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState({
+    id: "",
+    dni: "",
+    username: "",
+    email: "",
+    password: "",
   });
 
-  const [passwords, setPasswords] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmNewPassword: "",
-  });
+  const [notification, setNotification] = useState(null); // 👈 Para mostrar mensajes
 
-  const handleProfileChange = (e) => {
-    const { id, value } = e.target;
-    setProfile((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handlePasswordChange = (e) => {
-    const { id, value } = e.target;
-    setPasswords((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const handleProfileSubmit = (e) => {
-    e.preventDefault();
-    console.log("Datos actualizados:", profile);
-    alert("✅ Cambios guardados con éxito (simulado).");
-  };
-
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    if (passwords.newPassword !== passwords.confirmNewPassword) {
-      alert("⚠️ Las contraseñas no coinciden.");
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    if (!storedUserId) {
+      navigate("/login");
       return;
     }
-    console.log("Contraseña actualizada:", passwords);
-    alert("🔒 Contraseña actualizada correctamente (simulado).");
+
+    axios
+      .get(`http://localhost:8080/api/users/${storedUserId}`)
+      .then((res) => {
+        setUser({
+          id: res.data.id,
+          dni: res.data.dni || "",
+          username: res.data.username || "",
+          email: res.data.email || "",
+          password: "",
+        });
+      })
+      .catch((err) => {
+        console.error("Error al cargar usuario:", err);
+        showNotification("❌ Error al cargar los datos del perfil.", "error");
+      });
+  }, [navigate]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3500);
+  };
+
+  const handleSave = async () => {
+    try {
+      const payload = {
+        id: user.id,
+        dni: user.dni,
+        username: user.username,
+        email: user.email,
+      };
+
+      if (user.password.trim() !== "") {
+        payload.password = user.password;
+      }
+
+      await axios.put("http://localhost:8080/api/users/update", payload);
+
+      showNotification("✅ Perfil actualizado correctamente.", "success");
+    } catch (error) {
+      console.error("Error al actualizar perfil:", error);
+      if (error.response && error.response.data) {
+        showNotification(
+          `❌ ${error.response.data.message || "No se pudo actualizar el perfil."}`,
+          "error"
+        );
+      } else {
+        showNotification("❌ No se pudo actualizar el perfil.", "error");
+      }
+    }
   };
 
   return (
-    <div>
-      {/* NAVBAR */}
-      <nav className="navbar">
-        <div className="logo">
-          <a href="/dashboard">BANKO</a>
+    <div className="profile-settings-container">
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
         </div>
-        <div>
-          <a href="/dashboard">Volver al Dashboard</a>
-        </div>
-      </nav>
+      )}
 
-      {/* CONTENIDO PRINCIPAL */}
-      <div className="container" style={{ maxWidth: "600px" }}>
-        <h1
-          style={{
-            color: "var(--color-primary)",
-            marginBottom: "2rem",
-            textAlign: "center",
-          }}
-        >
-          Configuración de Perfil
-        </h1>
+      <button className="banko-button" onClick={() => navigate("/dashboard")}>
+        BANKO
+      </button>
 
-        {/* SECCIÓN: INFORMACIÓN PERSONAL */}
-        <div className="card">
-          <h2
-            style={{
-              marginBottom: "1.5rem",
-              borderBottom: "2px solid #ccc",
-              paddingBottom: "0.5rem",
-            }}
-          >
-            Información Personal
-          </h2>
+      <div className="profile-card">
+        <h2>Configuración de Perfil</h2>
 
-          <form onSubmit={handleProfileSubmit}>
-            <div className="form-group">
-              <label htmlFor="userId">ID de Usuario (Solo Lectura)</label>
-              <input
-                type="text"
-                id="userId"
-                value={profile.userId}
-                disabled
-                style={{ backgroundColor: "#f0f0f0", cursor: "not-allowed" }}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="dni">DNI / Identificación</label>
-              <input
-                type="text"
-                id="dni"
-                value={profile.dni}
-                onChange={handleProfileChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="username">Nombre de Usuario</label>
-              <input
-                type="text"
-                id="username"
-                value={profile.username}
-                onChange={handleProfileChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email">Correo Electrónico</label>
-              <input
-                type="email"
-                id="email"
-                value={profile.email}
-                onChange={handleProfileChange}
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="btn btn-primary"
-              style={{ width: "100%" }}
-            >
-              Guardar Cambios en Perfil
-            </button>
-          </form>
+        <div className="form-group">
+          <label htmlFor="dni">DNI</label>
+          <input
+            type="text"
+            id="dni"
+            name="dni"
+            value={user.dni}
+            onChange={handleChange}
+            placeholder="Tu número de DNI"
+          />
         </div>
 
-        {/* SECCIÓN: CAMBIAR CONTRASEÑA */}
-        <div className="card" style={{ marginTop: "30px" }}>
-          <h2
-            style={{
-              marginBottom: "1.5rem",
-              color: "var(--color-danger)",
-              borderBottom: "2px solid var(--color-danger)",
-              paddingBottom: "0.5rem",
-            }}
-          >
-            Cambiar Contraseña
-          </h2>
-
-          <form onSubmit={handlePasswordSubmit}>
-            <div className="form-group">
-              <label htmlFor="currentPassword">Contraseña Actual</label>
-              <input
-                type="password"
-                id="currentPassword"
-                value={passwords.currentPassword}
-                onChange={handlePasswordChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="newPassword">Nueva Contraseña</label>
-              <input
-                type="password"
-                id="newPassword"
-                value={passwords.newPassword}
-                onChange={handlePasswordChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmNewPassword">
-                Confirmar Nueva Contraseña
-              </label>
-              <input
-                type="password"
-                id="confirmNewPassword"
-                value={passwords.confirmNewPassword}
-                onChange={handlePasswordChange}
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="btn btn-danger"
-              style={{ width: "100%" }}
-            >
-              Actualizar Contraseña
-            </button>
-          </form>
+        <div className="form-group">
+          <label htmlFor="username">Nombre de Usuario</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={user.username}
+            onChange={handleChange}
+            placeholder="Tu nombre de usuario"
+          />
         </div>
+
+        <div className="form-group">
+          <label htmlFor="email">Correo Electrónico</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={user.email}
+            onChange={handleChange}
+            placeholder="Tu correo electrónico"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Nueva Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={user.password}
+            onChange={handleChange}
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button className="save-button" onClick={handleSave}>
+          Guardar Cambios
+        </button>
       </div>
     </div>
   );
