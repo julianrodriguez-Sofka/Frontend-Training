@@ -10,34 +10,35 @@ export default function Dashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
+  const fetchUserData = async () => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
 
-        if (!userId) {
-          setError("No se encontró el usuario. Inicia sesión nuevamente.");
-          setLoading(false);
-          return;
-        }
-
-        const userData = await getUserById(userId);
-        setUser(userData);
-
-        // Si el usuario tiene cuentas bancarias, usa el saldo de la primera
-        if (userData.bankAccounts && userData.bankAccounts.length > 0) {
-          setBalance(userData.bankAccounts[0].balance || 0);
-        }
-
-      } catch (err) {
-        console.error("❌ Error al cargar datos del usuario:", err);
-        setError("No se pudieron cargar los datos del usuario.");
-      } finally {
+      if (!storedUser || !storedUser.id) {
+        setError("No se encontró el usuario. Inicia sesión nuevamente.");
         setLoading(false);
+        return;
       }
-    };
 
-    fetchUserData();
-  }, []);
+      const userData = await getUserById(storedUser.id);
+      setUser(userData);
+
+      // Si el usuario tiene cuentas bancarias, usa el saldo de la primera
+      if (userData.bankAccounts && userData.bankAccounts.length > 0) {
+        setBalance(userData.bankAccounts[0].balance || 0);
+      }
+
+    } catch (err) {
+      console.error("❌ Error al cargar datos del usuario:", err);
+      setError("No se pudieron cargar los datos del usuario.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUserData();
+}, []);
+
 
   if (loading) {
     return (

@@ -1,3 +1,4 @@
+// src/pages/ProfileSettings/ProfileSettings.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./ProfileSettings.css";
@@ -14,17 +15,18 @@ const ProfileSettings = () => {
     password: "",
   });
 
-  const [notification, setNotification] = useState(null); // 👈 Para mostrar mensajes
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    if (!storedUserId) {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (!storedUser || !storedUser.id) {
       navigate("/login");
       return;
     }
 
+    // 🔹 Obtener usuario desde backend con el ID guardado
     axios
-      .get(`http://localhost:8080/api/users/${storedUserId}`)
+      .get(`http://localhost:8080/api/users/${storedUser.id}`)
       .then((res) => {
         setUser({
           id: res.data.id,
@@ -65,6 +67,10 @@ const ProfileSettings = () => {
 
       await axios.put("http://localhost:8080/api/users/update", payload);
 
+      // 🔹 Actualizar el localStorage con los nuevos datos
+      const updatedUser = { ...JSON.parse(localStorage.getItem("user")), ...payload };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
       showNotification("✅ Perfil actualizado correctamente.", "success");
     } catch (error) {
       console.error("Error al actualizar perfil:", error);
@@ -87,6 +93,7 @@ const ProfileSettings = () => {
         </div>
       )}
 
+      {/* 🔹 Botón superior BANKO */}
       <button className="banko-button" onClick={() => navigate("/dashboard")}>
         BANKO
       </button>
@@ -151,4 +158,3 @@ const ProfileSettings = () => {
 };
 
 export default ProfileSettings;
-
