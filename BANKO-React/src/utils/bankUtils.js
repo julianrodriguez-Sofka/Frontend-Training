@@ -1,4 +1,3 @@
-// src/utils/bankUtils.js
 
 // --- Balance management ---
 export const getBalance = () => {
@@ -72,7 +71,6 @@ export const handleTransfer = (amount, recipientDni) => {
   }
 };
 
-// --- React-friendly Alert ---
 export const showAlert = (setAlert, message, isSuccess = true) => {
   setAlert({ message, type: isSuccess ? "success" : "error" });
   setTimeout(() => setAlert(null), 4000);

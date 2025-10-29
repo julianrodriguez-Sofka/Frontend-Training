@@ -1,21 +1,22 @@
+// src/hooks/useRegister.js
 import { useState } from "react";
-import { registerUser } from "../services/userService";
+import { registerUser } from "../services/userService.js";
 
 export const useRegister = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const handleRegister = async (formData) => {
+  const handleRegister = async (userData) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
 
     try {
-      await registerUser(formData);
+      await registerUser(userData);
       setSuccess(true);
     } catch (err) {
-      setError(err.message || "No se pudo registrar");
+      setError(err.response?.data?.message || "Error en el registro");
     } finally {
       setLoading(false);
     }
@@ -23,3 +24,4 @@ export const useRegister = () => {
 
   return { handleRegister, loading, error, success };
 };
+
